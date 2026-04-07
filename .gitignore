@@ -33,7 +33,7 @@ venv.bak/
 .conda/
 
 # Data (large files not tracked by git — use DVC or document data download)
-data/
+/data/
 *.csv.gz
 *.sdf
 *.mol2
