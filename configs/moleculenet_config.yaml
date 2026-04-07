@@ -1,0 +1,207 @@
+# MolProp-GNN Configuration
+# All hyperparameters for MoleculeNet benchmarking experiments.
+# Override specific values via CLI: --hidden_dim 512 --lr 5e-4
+
+# =============================================================================
+# Experiment Settings
+# =============================================================================
+experiment:
+  name: "molprop-gnn-v1"
+  seed: 42
+  device: "cuda"          # "cpu" or "cuda"
+  log_level: "INFO"
+  checkpoint_dir: "./checkpoints"
+  results_dir: "./results"
+  use_wandb: false         # Set to true to enable Weights & Biases logging
+  wandb_project: "molprop-gnn"
+
+# =============================================================================
+# Data Settings
+# =============================================================================
+data:
+  root: "./data"
+  dataset: "bbbp"          # bbbp | hiv | esol | freesolv | lipophilicity | tox21 | sider
+  split: "scaffold"        # scaffold (recommended) | random
+  train_frac: 0.8
+  val_frac: 0.1
+  test_frac: 0.1
+  batch_size: 64
+  num_workers: 4
+  pin_memory: true
+
+  # Featurization
+  featurizer:
+    include_pharmacophore: true   # H-bond donor/acceptor, charged atoms
+    include_chirality: true       # stereocenter encoding
+    include_global: true          # whole-molecule descriptors (MW, TPSA, logP, etc.)
+
+# =============================================================================
+# Model Architectures
+# =============================================================================
+
+# ---- MPNN (Message Passing Neural Network) ----
+mpnn:
+  hidden_dim: 256
+  edge_dim: 64
+  num_layers: 4
+  readout: "attention"    # sum | mean | attention
+  dropout: 0.1
+
+# ---- GAT (Graph Attention Network) ----
+gat:
+  hidden_dim: 64          # per-head dim; total = hidden_dim * heads
+  num_layers: 4
+  heads: 4
+  edge_dim: 64
+  jk_mode: "cat"          # Jumping Knowledge: cat | max | lstm
+  dropout: 0.1
+  update_edges: true      # propagate updated edge features between layers
+
+# ---- GIN (Graph Isomorphism Network) ----
+gin:
+  hidden_dim: 300         # 300 is standard for GIN (Hu et al. 2020)
+  edge_dim: 64
+  num_layers: 5
+  use_virtual_node: true  # global information aggregation node
+  residual: true
+  dropout: 0.1
+
+# =============================================================================
+# Training Settings
+# =============================================================================
+training:
+  n_epochs: 200
+  learning_rate: 1.0e-3
+  weight_decay: 1.0e-5
+  max_grad_norm: 1.0
+  gradient_accumulation_steps: 1
+  use_amp: true            # automatic mixed precision (requires CUDA)
+  early_stopping_patience: 30
+  warmup_epochs: 5
+  scheduler: "cosine"      # cosine | plateau
+
+  # Class imbalance handling
+  # auto_pos_weight: automatically compute n_neg/n_pos ratio per task
+  auto_pos_weight: true
+  max_pos_weight: 20.0     # cap for extreme imbalance (e.g., HIV: ~99% negative)
+
+  # Task weighting (for multi-task datasets)
+  # null = equal weighting; alternatively specify per-task weights
+  task_weights: null
+
+  # Uncertainty-based task weighting (Kendall et al. 2018)
+  # Recommended for multi-task datasets like Tox21, SIDER
+  uncertainty_weighting: false
+
+# =============================================================================
+# Evaluation
+# =============================================================================
+evaluation:
+  # Primary metrics per dataset type
+  classification_metric: "mean_auroc"   # main metric for model selection
+  regression_metric: "mean_rmse"        # main metric for model selection
+
+  # Secondary metrics to report
+  classification_secondary: ["mean_auprc"]
+  regression_secondary: ["mean_mae", "mean_r2"]
+
+  # Per-scaffold analysis
+  scaffold_analysis: true
+  min_scaffold_size: 5     # minimum molecules per scaffold for per-scaffold metrics
+
+  # Applicability domain
+  ad_analysis: true
+  ad_threshold: 0.3        # Tanimoto similarity threshold for AD membership
+
+  # Scaffold vs random split comparison
+  compare_splits: false    # set true for the split comparison experiment
+
+# =============================================================================
+# Hyperparameter Sweep (Optuna)
+# =============================================================================
+hparam_sweep:
+  enabled: false
+  n_trials: 50
+  timeout: 3600            # max seconds for full sweep
+  n_epochs_per_trial: 50   # faster than full training
+  study_storage: null      # e.g. "sqlite:///optuna.db" for persistence
+
+  # Search spaces
+  search_space:
+    hidden_dim: [128, 256, 300, 512]
+    num_layers: [2, 3, 4, 5, 6]
+    learning_rate:
+      type: "log_uniform"
+      low: 1.0e-4
+      high: 1.0e-2
+    dropout:
+      type: "uniform"
+      low: 0.0
+      high: 0.3
+    weight_decay:
+      type: "log_uniform"
+      low: 1.0e-6
+      high: 1.0e-3
+    batch_size: [32, 64, 128]
+
+# =============================================================================
+# Dataset-specific defaults
+# These override the training settings above when the dataset is selected.
+# =============================================================================
+dataset_overrides:
+  bbbp:
+    training:
+      n_epochs: 200
+      learning_rate: 1.0e-3
+      auto_pos_weight: true
+    evaluation:
+      classification_metric: "mean_auroc"
+
+  hiv:
+    training:
+      n_epochs: 100         # HIV is large (41k), epochs are slow
+      learning_rate: 5.0e-4
+      batch_size: 128       # larger batch for stability on big dataset
+      auto_pos_weight: true
+    evaluation:
+      classification_metric: "mean_auroc"
+
+  esol:
+    training:
+      n_epochs: 300
+      learning_rate: 1.0e-3
+    evaluation:
+      regression_metric: "mean_rmse"
+
+  freesolv:
+    training:
+      n_epochs: 400         # small dataset (642 mols), need more epochs
+      learning_rate: 5.0e-4
+      early_stopping_patience: 50
+    evaluation:
+      regression_metric: "mean_rmse"
+
+  lipophilicity:
+    training:
+      n_epochs: 200
+      learning_rate: 1.0e-3
+    evaluation:
+      regression_metric: "mean_rmse"
+
+  tox21:
+    training:
+      n_epochs: 200
+      learning_rate: 1.0e-3
+      auto_pos_weight: true
+      uncertainty_weighting: true  # recommended for multi-task
+    evaluation:
+      classification_metric: "mean_auroc"
+
+  sider:
+    training:
+      n_epochs: 200
+      learning_rate: 5.0e-4
+      auto_pos_weight: true
+      uncertainty_weighting: true
+    evaluation:
+      classification_metric: "mean_auroc"

@@ -1,0 +1,95 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+.conda/
+
+# Data (large files not tracked by git — use DVC or document data download)
+data/
+*.csv.gz
+*.sdf
+*.mol2
+
+# Model checkpoints (large binaries — use Git LFS or external storage)
+checkpoints/
+*.pt
+*.pkl
+*.pickle
+
+# Results
+results/
+*.json
+!package*.json
+
+# Notebooks (outputs can be large — consider nbstripout)
+.ipynb_checkpoints
+notebooks/*.ipynb
+
+# Optuna databases
+*.db
+optuna_studies/
+
+# Logging
+logs/
+*.log
+tensorboard_runs/
+wandb/
+mlruns/
+
+# IDE / editors
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+.envrc
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.nox/
+
+# Type checking
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Documentation builds
+docs/_build/
+docs/api/
+
+# Temporary files
+tmp/
+temp/
+*.tmp

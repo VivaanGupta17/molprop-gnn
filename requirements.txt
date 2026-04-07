@@ -1,0 +1,66 @@
+# MolProp-GNN Dependencies
+# Install in order: PyTorch → PyG → RDKit → everything else
+#
+# NOTE: PyTorch and PyG must be installed with matching CUDA versions.
+# See README.md "Installation" section for full instructions.
+#
+# For CUDA 11.7:
+#   pip install torch==2.0.1 --index-url https://download.pytorch.org/whl/cu117
+#   pip install torch-geometric==2.3.1
+#   pip install torch-scatter torch-sparse -f https://data.pyg.org/whl/torch-2.0.1+cu117.html
+#
+# For CPU-only:
+#   pip install torch==2.0.1 --index-url https://download.pytorch.org/whl/cpu
+#   pip install torch-geometric==2.3.1
+
+# Core deep learning
+torch>=2.0.0
+torch-geometric>=2.3.0
+
+# Cheminformatics
+rdkit>=2023.3.1
+
+# Classical ML baselines
+scikit-learn>=1.3.0
+xgboost>=1.7.0
+
+# Data handling
+numpy>=1.24.0
+pandas>=2.0.0
+scipy>=1.10.0
+
+# Hyperparameter optimization
+optuna>=3.2.0
+optuna-dashboard>=0.9.0   # optional: web UI for Optuna
+
+# Experiment tracking (choose one or both)
+tensorboard>=2.13.0
+# wandb>=0.15.0            # uncomment if using Weights & Biases
+
+# Visualization
+matplotlib>=3.7.0
+seaborn>=0.12.0
+plotly>=5.15.0             # interactive plots
+
+# Configuration
+PyYAML>=6.0
+omegaconf>=2.3.0           # Hydra-compatible config management
+
+# Utilities
+tqdm>=4.65.0
+click>=8.1.0
+rich>=13.0.0               # better terminal output
+loguru>=0.7.0
+
+# Code quality (development)
+black>=23.0.0
+isort>=5.12.0
+flake8>=6.0.0
+mypy>=1.4.0
+pytest>=7.4.0
+pytest-cov>=4.1.0
+
+# Jupyter (optional, for notebooks)
+jupyter>=1.0.0
+ipywidgets>=8.0.0
+py3Dmol>=2.0.0             # 3D molecular visualization in notebooks
