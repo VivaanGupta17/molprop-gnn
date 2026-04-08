@@ -344,13 +344,20 @@ class MolecularFeaturizer:
         return result
 
     def featurize_smiles(self, smiles: str) -> Optional[dict]:
-        """Featurize a SMILES string. Returns None for invalid SMILES."""
+        """Featurize a SMILES string. Returns None for invalid SMILES.
+
+        Canonicalizes the SMILES string before featurization to ensure
+        consistent atom ordering regardless of input representation.
+        """
         if not RDKIT_AVAILABLE:
             raise ImportError("RDKit is required for molecular featurization.")
         mol = Chem.MolFromSmiles(smiles)
         if mol is None:
             logger.warning(f"Cannot parse SMILES: {smiles}")
             return None
+        # canonicalize to normalize atom ordering across different SMILES representations
+        canonical = Chem.MolToSmiles(mol, canonical=True)
+        mol = Chem.MolFromSmiles(canonical)
         return self.featurize_mol(mol)
 
     @property
