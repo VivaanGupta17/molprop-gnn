@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import random
 """
 Training script for MolProp-GNN.
 
