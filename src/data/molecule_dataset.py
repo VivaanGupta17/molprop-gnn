@@ -562,3 +562,5 @@ def analyze_scaffold_overlap(
         "scaffold_overlap_fraction": len(overlap) / len(test_scaffolds) if test_scaffolds else 0,
         "jaccard_similarity": len(overlap) / len(union) if union else 0,
     }
+
+# Handle molecules with no Bemis-Murcko scaffold
