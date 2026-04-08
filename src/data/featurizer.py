@@ -364,3 +364,5 @@ class MolecularFeaturizer:
     @property
     def global_feature_dim(self) -> Optional[int]:
         return self.global_featurizer.feature_dim if self.global_featurizer else None
+
+# Validate SMILES before featurization
