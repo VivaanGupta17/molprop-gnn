@@ -209,7 +209,12 @@ class GINModel(nn.Module):
         )
 
         h = self.atom_encoder(x)
-        e = self.bond_encoder(edge_attr)
+
+        # handle single-atom molecules where edge_attr is empty
+        if edge_attr is None or edge_attr.numel() == 0:
+            e = x.new_zeros((0, self.hidden_dim))
+        else:
+            e = self.bond_encoder(edge_attr)
 
         # Initialize virtual node embedding
         if self.use_virtual_node:
