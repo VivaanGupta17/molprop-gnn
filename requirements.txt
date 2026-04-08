@@ -6,16 +6,16 @@
 #
 # For CUDA 11.7:
 #   pip install torch==2.0.1 --index-url https://download.pytorch.org/whl/cu117
-#   pip install torch-geometric==2.3.1
+#   pip install torch-geometric>=2.5.0==2.3.1
 #   pip install torch-scatter torch-sparse -f https://data.pyg.org/whl/torch-2.0.1+cu117.html
 #
 # For CPU-only:
 #   pip install torch==2.0.1 --index-url https://download.pytorch.org/whl/cpu
-#   pip install torch-geometric==2.3.1
+#   pip install torch-geometric>=2.5.0==2.3.1
 
 # Core deep learning
 torch>=2.0.0
-torch-geometric>=2.3.0
+torch-geometric>=2.5.0>=2.3.0
 
 # Cheminformatics
 rdkit>=2023.3.1
